@@ -1,92 +1,102 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, Headers, SetMetadata } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { IncomingHttpHeaders } from 'http';
 
 import { AuthService } from './auth.service';
-import { RawHeaders, GetUser, Auth } from './decorators';
-import { RoleProtected } from './decorators/role-protected.decorator';
-
+import { Auth, getRawHeaders, getUser, RoleProtected } from './decorators';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from './entities/user.entity';
-import { UserRoleGuard } from './guards/user-role.guard';
-import { ValidRoles } from './interfaces';
+import { UseRoleGuard } from './guards/use-role.guard';
+import { ValidRoles } from './interface/valid-roles.enum';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,
+  ) { }
 
 
 
   @Post('register')
-  createUser(@Body() createUserDto: CreateUserDto ) {
-    return this.authService.create( createUserDto );
+  createUser(@Body() createUserDto: CreateUserDto) {
+    return this.authService.create(createUserDto);
   }
-
   @Post('login')
-  loginUser(@Body() loginUserDto: LoginUserDto ) {
-    return this.authService.login( loginUserDto );
+  loginUser(@Body() loginUserDto: LoginUserDto) {
+    return this.authService.login(loginUserDto);
   }
-
-  @Get('check-status')
-  @Auth()
-  checkAuthStatus(
-    @GetUser() user: User
-  ) {
-    return this.authService.checkAuthStatus( user );
-  }
-
 
   @Get('private')
-  @UseGuards( AuthGuard() )
-  testingPrivateRoute(
+  @UseGuards(AuthGuard())
+  testRoutePrivate(
     @Req() request: Express.Request,
-    @GetUser() user: User,
-    @GetUser('email') userEmail: string,
-    
-    @RawHeaders() rawHeaders: string[],
-    @Headers() headers: IncomingHttpHeaders,
   ) {
-
-
+    console.log(request.user, 'req.user');
     return {
+      message: 'This is a private route',
       ok: true,
-      message: 'Hola Mundo Private',
-      user,
-      userEmail,
-      rawHeaders,
-      headers
-    }
+      user: request.user
+    };
   }
 
 
-  // @SetMetadata('roles', ['admin','super-user'])
-
   @Get('private2')
-  @RoleProtected( ValidRoles.superUser, ValidRoles.admin )
-  @UseGuards( AuthGuard(), UserRoleGuard )
-  privateRoute2(
-    @GetUser() user: User
-  ) {
+  @UseGuards(AuthGuard())
+  testRoutePrivate2(
+    @getUser() user: User,
+    @getRawHeaders() rawHeaders: string[],
+    @Headers() headers: string[],
 
+  ) {
     return {
+      message: 'This is a private route',
       ok: true,
-      user
-    }
+      user: user,
+      rawHeaders: headers
+    };
   }
 
 
   @Get('private3')
-  @Auth( ValidRoles.admin )
-  privateRoute3(
-    @GetUser() user: User
+  @SetMetadata('roles', ['admin', 'user'])
+  @UseGuards(AuthGuard(), UseRoleGuard)
+  testRoutePrivate3(
+    @getUser() user: User,
+    @Headers() headers: string[],
   ) {
-
     return {
+      message: 'This is a private route',
       ok: true,
-      user
-    }
+      user,
+      headers
+    };
+  }
+
+  @Get('private4')
+  @RoleProtected('admin', ValidRoles.user)
+  @UseGuards(AuthGuard(), UseRoleGuard)
+  testRoutePrivate4(
+    @getUser() user: User,
+    @Headers() headers: string[],
+  ) {
+    return {
+      message: 'This is a private route',
+      ok: true,
+      user,
+      headers
+    };
   }
 
 
-
+  @Get('private5')
+  @Auth(ValidRoles.user)
+  testRoutePrivate5(
+    @getUser() user: User,
+    @Headers() headers: string[],
+  ) {
+    return {
+      message: 'This is a private route',
+      ok: true,
+      user,
+      headers
+    };
+  }
 }
