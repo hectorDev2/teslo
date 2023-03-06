@@ -10,6 +10,7 @@ import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -21,13 +22,13 @@ import { AuthModule } from './auth/auth.module';
       port: +process.env.DB_PORT,
       database: process.env.DB_NAME,
       username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,      
+      password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname,'..','public'), 
+      rootPath: join(__dirname, '..', 'public'),
     }),
 
     ProductsModule,
@@ -39,7 +40,8 @@ import { AuthModule } from './auth/auth.module';
     FilesModule,
 
     AuthModule,
+    PassportModule
 
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,92 +1,115 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ProductImage } from './';
 import { User } from '../../auth/entities/user.entity';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity({ name: 'products' })
 export class Product {
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+	@ApiProperty()
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
-    @Column('text', {
-        unique: true,
-    })
-    title: string;
-
-    @Column('float',{
-        default: 0
-    })
-    price: number;
-
-    @Column({
-        type: 'text',
-        nullable: true
-    })
-    description: string;
-
-    @Column('text', {
-        unique: true
-    })
-    slug: string;
-
-    @Column('int', {
-        default: 0
-    })
-    stock: number;
-
-    @Column('text',{
-        array: true
-    })
-    sizes: string[];
-
-    @Column('text')
-    gender: string;
+	@ApiProperty()
+	@Column('text', {
+		unique: true,
+	})
+	title: string;
 
 
-    @Column('text', {
-        array: true,
-        default: []
-    })
-    tags: string[];
+	@ApiProperty()
+	@Column('float', {
+		default: 0
+	})
+	price: number;
 
-    // images
-    @OneToMany(
-        () => ProductImage,
-        (productImage) => productImage.product,
-        { cascade: true, eager: true }
-    )
-    images?: ProductImage[];
+	@ApiProperty()
+	@Column({
+		type: 'text',
+		nullable: true
+	})
+	description: string;
 
+	@ApiProperty()
+	@Column('text', {
+		unique: true
+	})
+	slug: string;
 
-    @ManyToOne(
-        () => User,
-        ( user ) => user.product,
-        { eager: true }
-    )
-    user: User
+	@ApiProperty()
+	@Column('int', {
+		default: 0
+	})
+	stock: number;
 
+	@ApiProperty({
+		type: [String],
+		description: 'Array of sizes',
+		examples: ['S', 'M', 'L']
+	})
+	@Column('text', {
+		array: true
+	})
+	sizes: string[];
 
-    @BeforeInsert()
-    checkSlugInsert() {
+	@ApiProperty({
+		example: "women",
+		description: "gender of product"
+	})
+	@Column('text')
+	gender: string;
 
-        if ( !this.slug ) {
-            this.slug = this.title;
-        }
+	@ApiProperty({
+		type: [String],
+		description: 'Array of tags',
+		examples: ['new', 'sale', 'bestseller']
+	})
+	@Column('text', {
+		array: true,
+		default: []
+	})
+	tags: string[];
 
-        this.slug = this.slug
-            .toLowerCase()
-            .replaceAll(' ','_')
-            .replaceAll("'",'')
+	@ApiPropertyOptional({
+		type: [ProductImage],
+		description: 'Array of images'
+	})
+	// images
+	@OneToMany(
+		() => ProductImage,
+		(productImage) => productImage.product,
+		{ cascade: true, eager: true }
+	)
+	images?: ProductImage[];
 
-    }
+	@ManyToOne(
+		() => User,
+		(user) => user.product,
+		{ eager: true }
+	)
+	user: User
 
-    @BeforeUpdate()
-    checkSlugUpdate() {
-        this.slug = this.slug
-            .toLowerCase()
-            .replaceAll(' ','_')
-            .replaceAll("'",'')
-    }
+	@BeforeInsert()
+	checkSlugInsert() {
+
+		if (!this.slug) {
+			this.slug = this.title;
+		}
+
+		this.slug = this.slug
+			.toLowerCase()
+			.replaceAll(' ', '_')
+			.replaceAll("'", '')
+
+	}
+
+	@BeforeUpdate()
+	checkSlugUpdate() {
+		this.slug = this.slug
+			.toLowerCase()
+			.replaceAll(' ', '_')
+			.replaceAll("'", '')
+	}
 
 
 }

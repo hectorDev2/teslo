@@ -3,12 +3,14 @@ import { ConfigModule } from '@nestjs/config';
 
 import { FilesService } from './files.service';
 import { FilesController } from './files.controller';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [FilesController],
   providers: [FilesService],
   imports: [
-    ConfigModule
+    ConfigModule,
+    PassportModule
   ]
 })
-export class FilesModule {}
+export class FilesModule { }

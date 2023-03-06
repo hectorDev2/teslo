@@ -5,6 +5,7 @@ import { ProductsModule } from './../products/products.module';
 
 import { SeedService } from './seed.service';
 import { SeedController } from './seed.controller';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [SeedController],
@@ -12,6 +13,7 @@ import { SeedController } from './seed.controller';
   imports: [
     ProductsModule,
     AuthModule,
+    PassportModule
   ]
 })
-export class SeedModule {}
+export class SeedModule { }

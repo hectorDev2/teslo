@@ -1,10 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Product } from '../../products/entities';
 
 
 @Entity('users')
 export class User {
-    
+
+
+
+    @ApiProperty()
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -13,19 +17,23 @@ export class User {
     })
     email: string;
 
+    @ApiProperty()
     @Column('text', {
         select: false
     })
     password: string;
 
+    @ApiProperty()
     @Column('text')
     fullName: string;
 
+    @ApiProperty()
     @Column('bool', {
         default: true
     })
     isActive: boolean;
 
+    @ApiProperty()
     @Column('text', {
         array: true,
         default: ['user']
@@ -34,7 +42,7 @@ export class User {
 
     @OneToMany(
         () => Product,
-        ( product ) => product.user
+        (product) => product.user
     )
     product: Product;
 
@@ -46,7 +54,7 @@ export class User {
 
     @BeforeUpdate()
     checkFieldsBeforeUpdate() {
-        this.checkFieldsBeforeInsert();   
+        this.checkFieldsBeforeInsert();
     }
 
 }

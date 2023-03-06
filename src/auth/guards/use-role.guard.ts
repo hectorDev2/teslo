@@ -13,12 +13,10 @@ export class UseRoleGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
 
     const activeRoles = this.reflector.get<string[]>('roles', context.getHandler());
-    console.log(activeRoles, 'activeRoles');
 
 
     const request = context.switchToHttp().getRequest();
     const user = request.user as User;
-    console.log(user, 'user');
 
     if (!user) {
       throw new UnauthorizedException('user not found');
